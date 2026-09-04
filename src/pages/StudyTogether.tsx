@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Pause, Check, Plus } from 'lucide-react';
+import { Play, Pause, Check, Plus, Pencil, Trash2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCouple } from '@/context/CoupleContext';
 import { useStudySession } from '@/hooks/useStudySession';
@@ -11,9 +11,13 @@ import { cx } from '@/lib/utils';
 export default function StudyTogether() {
   const { profile } = useAuth();
   const { couple, partner } = useCouple();
-  const { session, tasks, joinSession, leaveSession, addTask, toggleTask } = useStudySession(couple?.id ?? null);
+  const { session, tasks, joinSession, leaveSession, addTask, toggleTask, editTask, deleteTask } = useStudySession(
+    couple?.id ?? null
+  );
   const [newTask, setNewTask] = useState('');
   const [now, setNow] = useState(Date.now());
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState('');
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -84,25 +88,57 @@ export default function StudyTogether() {
         <div>
           <h2 className="mb-3 px-1 font-display text-base text-ink dark:text-cream">Shared checklist</h2>
           <GlassCard className="space-y-3">
-            {tasks.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => toggleTask(t.id, !t.is_done)}
-                className="flex w-full items-center gap-3 text-left"
-              >
-                <span
-                  className={cx(
-                    'flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2',
-                    t.is_done ? 'border-rose-500 bg-rose-500' : 'border-ink/20 dark:border-white/20'
-                  )}
+            {tasks.map((t) =>
+              editingId === t.id ? (
+                <form
+                  key={t.id}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    editTask(t.id, editValue);
+                    setEditingId(null);
+                  }}
+                  className="flex items-center gap-2"
                 >
-                  {t.is_done && <Check size={13} className="text-white" />}
-                </span>
-                <span className={cx('text-sm', t.is_done && 'text-ink-500 line-through dark:text-cream/40')}>
-                  {t.title}
-                </span>
-              </button>
-            ))}
+                  <input
+                    autoFocus
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    className="input-field flex-1 py-2 text-sm"
+                  />
+                  <button type="submit" className="rounded-full bg-rose-500 p-2 text-white">
+                    <Check size={14} />
+                  </button>
+                </form>
+              ) : (
+                <div key={t.id} className="flex w-full items-center gap-3">
+                  <button onClick={() => toggleTask(t.id, !t.is_done)} className="flex flex-1 items-center gap-3 text-left">
+                    <span
+                      className={cx(
+                        'flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2',
+                        t.is_done ? 'border-rose-500 bg-rose-500' : 'border-ink/20 dark:border-white/20'
+                      )}
+                    >
+                      {t.is_done && <Check size={13} className="text-white" />}
+                    </span>
+                    <span className={cx('text-sm', t.is_done && 'text-ink-500 line-through dark:text-cream/40')}>
+                      {t.title}
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingId(t.id);
+                      setEditValue(t.title);
+                    }}
+                    className="shrink-0 rounded-full p-1.5 text-ink-500 dark:text-cream/50"
+                  >
+                    <Pencil size={13} />
+                  </button>
+                  <button onClick={() => deleteTask(t.id)} className="shrink-0 rounded-full p-1.5 text-rose-500">
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              )
+            )}
             {tasks.length === 0 && <p className="text-sm text-ink-500 dark:text-cream/40">No assignments yet.</p>}
             <form onSubmit={handleAddTask} className="flex items-center gap-2 pt-1">
               <input

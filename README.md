@@ -19,7 +19,10 @@ as a PWA on both partners' phones.
 ## 2. Set up Supabase
 
 1. Create a new Supabase project.
-2. Open **SQL Editor** and run the migration in `supabase/migrations/0001_init.sql`. This creates:
+2. Open **SQL Editor** and run, in order, `supabase/migrations/0001_init.sql` then
+   `supabase/migrations/0002_mood_dedupe_and_editing.sql`. The first creates the full schema;
+   the second adds a per-day unique constraint on moods (so repeated taps update one row
+   instead of creating duplicates) and the matching update policy. Migration 1 creates:
    - Tables: `users`, `couples`, `messages`, `typing_status`, `memories`, `events`, `moods`,
      `bucket_list`, `locket_photos`, `surprises`, `study_sessions`, `study_tasks`
    - RPC functions `create_couple` / `join_couple` for invite-code linking
@@ -109,6 +112,34 @@ Supabase Realtime (Postgres CDC) powers: instant love notes, typing indicators, 
 receipts, presence (`is_online` heartbeat + visibility events), live photo/locket sync, mood
 updates, and the shared Pomodoro timer/checklist — all via `supabase.channel(...).on('postgres_changes', ...)`
 subscriptions scoped per couple, so both phones update within milliseconds of each other.
+
+## What's new in this update
+
+- **Editable anniversary** — pencil icon on the Calendar reopens the date picker anytime.
+- **Editable & deletable calendar events**, plus a **"Add to phone calendar"** button per
+  event and for the anniversary — downloads a real `.ics` file that Apple Calendar, Google
+  Calendar, and Outlook all import natively (recurring yearly for birthdays/anniversary).
+- **"Notes" renamed to "Chats"**, with real notifications: an in-app toast + unread badge on
+  the bottom nav whenever your partner sends a message while you're elsewhere in the app, and
+  a native browser notification if you've granted permission (toggle in Settings) and the tab
+  is backgrounded.
+- **Mood is now a shared status**, shown on the Home dashboard as a Facebook-style "feeling —"
+  line for both partners with a heart between them, plus a 🔥 streak badge for consecutive
+  days you've both checked in.
+- **Daily quote** already rotates automatically every day for both partners (it's derived from
+  the calendar date, so no action needed — confirmed working as intended).
+- **Memories**: tap any photo/video to open it full-screen; the uploader gets a delete button.
+- **Study Together tasks** are now editable (pencil) and deletable (trash), in addition to
+  checking them off.
+- **Secret Surprises** can be edited (title, message, unlock time) by their creator up until
+  the moment they're unlocked.
+- **Mood duplicate-save bug fixed**: mood check-ins now `upsert` against a `(couple, user, day)`
+  unique constraint instead of inserting a new row every tap, plus a client-side guard blocks
+  overlapping requests — so rapid taps update one row, not several.
+- **New feature — "Thinking of You"**: a one-tap button on Home instantly sends a preset love
+  note to your partner (with the heart-burst animation), no typing required.
+- **New feature — check-in streak**: Home shows a flame badge counting consecutive days both
+  of you have logged a mood.
 
 ## Notes & next steps
 

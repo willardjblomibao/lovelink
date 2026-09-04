@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Check, CheckCheck } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCouple } from '@/context/CoupleContext';
+import { useNotifications } from '@/context/NotificationContext';
 import { useMessages, useTypingIndicator } from '@/hooks/useMessages';
 import { TopBar } from '@/components/ui/TopBar';
 import { cx, formatTime } from '@/lib/utils';
@@ -13,6 +14,7 @@ export default function LoveNotes() {
   const { couple, partner } = useCouple();
   const { messages, sendMessage, react } = useMessages(couple?.id ?? null, profile?.id ?? null);
   const { partnerTyping, setTyping } = useTypingIndicator(couple?.id ?? null, profile?.id ?? null);
+  const { clearUnreadChats } = useNotifications();
 
   const [draft, setDraft] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -21,6 +23,11 @@ export default function LoveNotes() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length, partnerTyping]);
+
+  useEffect(() => {
+    clearUnreadChats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages.length]);
 
   const handleChange = (value: string) => {
     setDraft(value);
@@ -40,7 +47,7 @@ export default function LoveNotes() {
 
   return (
     <div className="flex h-screen flex-col bg-cream dark:bg-charcoal">
-      <TopBar title={partner ? `${partner.display_name}` : 'Love Notes'} showBack right={<span />} />
+      <TopBar title={partner ? `${partner.display_name}` : 'Chats'} showBack right={<span />} />
 
       <div className="flex-1 space-y-3 overflow-y-auto px-4 pb-3 pt-2">
         {messages.map((m) => {

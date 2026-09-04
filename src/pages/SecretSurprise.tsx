@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Plus, Gift } from 'lucide-react';
+import { Lock, Plus, Gift, Pencil } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { useCouple } from '@/context/CoupleContext';
@@ -20,6 +20,7 @@ export default function SecretSurprise() {
   const [content, setContent] = useState('');
   const [unlockAt, setUnlockAt] = useState('');
   const [opened, setOpened] = useState<Surprise | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!couple?.id) return;
@@ -35,20 +36,41 @@ export default function SecretSurprise() {
     load();
   }, [load]);
 
-  const handleCreate = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!couple?.id || !profile?.id || !title.trim() || !content.trim() || !unlockAt) return;
-    await supabase.from('surprises').insert({
-      couple_id: couple.id,
-      created_by: profile.id,
-      title: title.trim(),
-      content: content.trim(),
-      unlock_at: new Date(unlockAt).toISOString()
-    });
+  const resetForm = () => {
     setTitle('');
     setContent('');
     setUnlockAt('');
     setShowForm(false);
+    setEditingId(null);
+  };
+
+  const openEdit = (s: Surprise) => {
+    setEditingId(s.id);
+    setTitle(s.title);
+    setContent(s.content);
+    setUnlockAt(new Date(s.unlock_at).toISOString().slice(0, 16));
+    setShowForm(true);
+  };
+
+  const handleCreate = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!couple?.id || !profile?.id || !title.trim() || !content.trim() || !unlockAt) return;
+
+    if (editingId) {
+      await supabase
+        .from('surprises')
+        .update({ title: title.trim(), content: content.trim(), unlock_at: new Date(unlockAt).toISOString() })
+        .eq('id', editingId);
+    } else {
+      await supabase.from('surprises').insert({
+        couple_id: couple.id,
+        created_by: profile.id,
+        title: title.trim(),
+        content: content.trim(),
+        unlock_at: new Date(unlockAt).toISOString()
+      });
+    }
+    resetForm();
     load();
   };
 
@@ -70,7 +92,10 @@ export default function SecretSurprise() {
         title="Secret Surprises"
         showBack
         right={
-          <button onClick={() => setShowForm((s) => !s)} className="rounded-full bg-rose-500 p-2 text-white shadow-soft">
+          <button
+            onClick={() => (showForm ? resetForm() : setShowForm(true))}
+            className="rounded-full bg-rose-500 p-2 text-white shadow-soft"
+          >
             <Plus size={18} />
           </button>
         }
@@ -101,9 +126,16 @@ export default function SecretSurprise() {
                 value={unlockAt}
                 onChange={(e) => setUnlockAt(e.target.value)}
               />
-              <Button full onClick={handleCreate}>
-                Lock it away
-              </Button>
+              <div className="flex gap-2">
+                <Button full onClick={handleCreate}>
+                  {editingId ? 'Save changes' : 'Lock it away'}
+                </Button>
+                {editingId && (
+                  <Button variant="secondary" onClick={resetForm}>
+                    Cancel
+                  </Button>
+                )}
+              </div>
             </GlassCard>
           </motion.div>
         )}
@@ -113,24 +145,34 @@ export default function SecretSurprise() {
             const isMine = s.created_by === profile?.id;
             const canUnlock = new Date(s.unlock_at).getTime() <= Date.now();
             const showContent = isMine || s.is_unlocked;
+            const canEdit = isMine && !s.is_unlocked;
             return (
-              <motion.button
+              <motion.div
                 key={s.id}
                 initial={{ opacity: 0, scale: 0.92 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: i * 0.05 }}
-                onClick={() => openSurprise(s)}
-                disabled={isMine || !canUnlock}
-                className="glass-card flex flex-col items-center gap-2 py-6 text-center"
+                className="glass-card relative flex flex-col items-center gap-2 py-6 text-center"
               >
-                {showContent ? <Gift size={26} className="text-rose-500" /> : <Lock size={22} className="text-ink-500 dark:text-cream/40" />}
-                <span className="text-sm font-medium text-ink dark:text-cream">
-                  {showContent ? s.title : isMine ? `${s.title} (yours)` : 'Locked surprise'}
-                </span>
-                <span className="text-[11px] text-ink-500 dark:text-cream/40">
-                  {canUnlock ? (isMine ? 'Waiting for them to open' : 'Tap to open!') : `Unlocks ${new Date(s.unlock_at).toLocaleDateString()}`}
-                </span>
-              </motion.button>
+                {canEdit && (
+                  <button
+                    onClick={() => openEdit(s)}
+                    className="absolute right-2 top-2 rounded-full bg-white/70 p-1.5 text-ink-500 dark:bg-white/10 dark:text-cream/60"
+                    aria-label="Edit surprise"
+                  >
+                    <Pencil size={12} />
+                  </button>
+                )}
+                <button onClick={() => openSurprise(s)} disabled={isMine || !canUnlock} className="flex flex-col items-center gap-2">
+                  {showContent ? <Gift size={26} className="text-rose-500" /> : <Lock size={22} className="text-ink-500 dark:text-cream/40" />}
+                  <span className="text-sm font-medium text-ink dark:text-cream">
+                    {showContent ? s.title : isMine ? `${s.title} (yours)` : 'Locked surprise'}
+                  </span>
+                  <span className="text-[11px] text-ink-500 dark:text-cream/40">
+                    {canUnlock ? (isMine ? 'Waiting for them to open' : 'Tap to open!') : `Unlocks ${new Date(s.unlock_at).toLocaleDateString()}`}
+                  </span>
+                </button>
+              </motion.div>
             );
           })}
         </div>

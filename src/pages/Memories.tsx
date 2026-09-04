@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Plus, Heart } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Heart, Trash2, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { useCouple } from '@/context/CoupleContext';
@@ -16,6 +16,8 @@ export default function Memories() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
+  const [viewing, setViewing] = useState<Memory | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -65,6 +67,14 @@ export default function Memories() {
 
   const toggleFavorite = async (memory: Memory) => {
     await supabase.from('memories').update({ is_favorite: !memory.is_favorite }).eq('id', memory.id);
+    setViewing((v) => (v && v.id === memory.id ? { ...v, is_favorite: !memory.is_favorite } : v));
+  };
+
+  const deleteMemory = async (memory: Memory) => {
+    setDeleting(true);
+    await supabase.from('memories').delete().eq('id', memory.id);
+    setDeleting(false);
+    setViewing(null);
   };
 
   const visible = filter === 'favorites' ? memories.filter((m) => m.is_favorite) : memories;
@@ -121,11 +131,12 @@ export default function Memories() {
       ) : (
         <div className="grid grid-cols-2 gap-2 px-4">
           {visible.map((m, i) => (
-            <motion.div
+            <motion.button
               key={m.id}
               initial={{ opacity: 0, scale: 0.94 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: (i % 6) * 0.04 }}
+              onClick={() => setViewing(m)}
               className="group relative aspect-square overflow-hidden rounded-2xl bg-white/40 dark:bg-white/5"
             >
               {m.media_type === 'video' ? (
@@ -133,16 +144,72 @@ export default function Memories() {
               ) : (
                 <img src={m.media_url} alt={m.caption ?? 'Memory'} className="h-full w-full object-cover" />
               )}
-              <button
-                onClick={() => toggleFavorite(m)}
+              <span
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleFavorite(m);
+                }}
                 className="absolute right-2 top-2 rounded-full bg-black/30 p-1.5 backdrop-blur-sm"
               >
                 <Heart size={14} className={cx('text-white', m.is_favorite && 'fill-rose-500 text-rose-500')} />
-              </button>
-            </motion.div>
+              </span>
+            </motion.button>
           ))}
         </div>
       )}
+
+      <AnimatePresence>
+        {viewing && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex flex-col bg-black/90"
+            onClick={() => setViewing(null)}
+          >
+            <div className="safe-top flex items-center justify-between px-4 py-4">
+              <button onClick={() => setViewing(null)} className="rounded-full bg-white/10 p-2 text-white">
+                <X size={20} />
+              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(viewing);
+                  }}
+                  className="rounded-full bg-white/10 p-2 text-white"
+                >
+                  <Heart size={18} className={cx(viewing.is_favorite && 'fill-rose-500 text-rose-500')} />
+                </button>
+                {viewing.uploader_id === profile?.id && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteMemory(viewing);
+                    }}
+                    disabled={deleting}
+                    className="rounded-full bg-white/10 p-2 text-white disabled:opacity-50"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
+              </div>
+            </div>
+            <motion.div
+              className="flex flex-1 items-center justify-center px-4"
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+            >
+              {viewing.media_type === 'video' ? (
+                <video src={viewing.media_url} className="max-h-full max-w-full rounded-2xl" controls autoPlay />
+              ) : (
+                <img src={viewing.media_url} alt="" className="max-h-full max-w-full rounded-2xl object-contain" />
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

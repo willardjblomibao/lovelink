@@ -50,3 +50,63 @@ export function quoteForToday() {
   const day = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
   return DAILY_QUOTES[day % DAILY_QUOTES.length];
 }
+
+/** Formats a Date as YYYYMMDD for all-day ICS events. */
+function icsDate(d: Date) {
+  return d.toISOString().slice(0, 10).replace(/-/g, '');
+}
+
+/**
+ * Builds a minimal .ics file for a single all-day, yearly-recurring or
+ * one-off event, so it can be imported into the phone's native calendar
+ * (Apple Calendar, Google Calendar, Outlook all accept this format).
+ */
+export function buildICS({
+  title,
+  dateStr,
+  description,
+  recurringYearly
+}: {
+  title: string;
+  dateStr: string; // YYYY-MM-DD
+  description?: string;
+  recurringYearly?: boolean;
+}) {
+  const start = new Date(dateStr);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 1);
+  const uid = `${crypto.randomUUID()}@lovelink.app`;
+  const rrule = recurringYearly ? 'RRULE:FREQ=YEARLY\n' : '';
+
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//LoveLink//EN',
+    'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTAMP:${icsDate(new Date())}T000000Z`,
+    `DTSTART;VALUE=DATE:${icsDate(start)}`,
+    `DTEND;VALUE=DATE:${icsDate(end)}`,
+    rrule.trim(),
+    `SUMMARY:${title.replace(/\n/g, ' ')}`,
+    description ? `DESCRIPTION:${description.replace(/\n/g, ' ')}` : '',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ]
+    .filter(Boolean)
+    .join('\r\n');
+}
+
+/** Triggers a browser download of an .ics file so the OS can offer to add it to Calendar. */
+export function downloadICS(filename: string, icsContent: string) {
+  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename.endsWith('.ics') ? filename : `${filename}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}

@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react';
-import { LogOut, Moon, Sun, Camera } from 'lucide-react';
+import { LogOut, Moon, Sun, Camera, Bell, BellOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCouple } from '@/context/CoupleContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useNotifications } from '@/context/NotificationContext';
 import { supabase } from '@/lib/supabase';
 import { TopBar } from '@/components/ui/TopBar';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -14,6 +15,7 @@ export default function Settings() {
   const { profile, signOut, refreshProfile } = useAuth();
   const { couple } = useCouple();
   const { theme, toggleTheme } = useTheme();
+  const { permission, requestPermission } = useNotifications();
   const [uploading, setUploading] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -67,6 +69,31 @@ export default function Settings() {
             <span className="font-display text-lg tracking-widest text-rose-500">{couple.invite_code}</span>
           </GlassCard>
         )}
+
+        <GlassCard className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {permission === 'granted' ? (
+              <Bell size={18} className="text-rose-500" />
+            ) : (
+              <BellOff size={18} className="text-rose-500" />
+            )}
+            <div>
+              <p className="text-sm font-medium text-ink dark:text-cream">Chat notifications</p>
+              <p className="text-xs text-ink-500 dark:text-cream/50">
+                {permission === 'granted'
+                  ? 'On — you\'ll be notified of new chats'
+                  : permission === 'denied'
+                  ? 'Blocked in browser settings'
+                  : 'Off — enable to get notified'}
+              </p>
+            </div>
+          </div>
+          {permission !== 'granted' && permission !== 'denied' && (
+            <Button variant="secondary" onClick={requestPermission} className="px-4 py-2 text-xs">
+              Enable
+            </Button>
+          )}
+        </GlassCard>
 
         <GlassCard className="flex items-center justify-between">
           <div className="flex items-center gap-3">

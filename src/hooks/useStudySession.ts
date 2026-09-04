@@ -74,5 +74,14 @@ export function useStudySession(coupleId: string | null) {
     await supabase.from('study_tasks').update({ is_done: isDone }).eq('id', taskId);
   };
 
-  return { session, tasks, loading, joinSession, leaveSession, addTask, toggleTask };
+  const editTask = async (taskId: string, title: string) => {
+    if (!title.trim()) return;
+    await supabase.from('study_tasks').update({ title: title.trim() }).eq('id', taskId);
+  };
+
+  const deleteTask = async (taskId: string) => {
+    await supabase.from('study_tasks').delete().eq('id', taskId);
+  };
+
+  return { session, tasks, loading, joinSession, leaveSession, addTask, toggleTask, editTask, deleteTask };
 }

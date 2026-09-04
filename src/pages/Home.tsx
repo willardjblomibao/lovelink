@@ -1,18 +1,34 @@
+import { useState, type MouseEvent } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Settings as SettingsIcon, MessageCircle, Smile, Timer, Image as ImageIcon, ListChecks, Lock } from 'lucide-react';
+import {
+  Settings as SettingsIcon,
+  MessageCircle,
+  Smile,
+  Timer,
+  Image as ImageIcon,
+  ListChecks,
+  Lock,
+  Flame,
+  Heart
+} from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCouple } from '@/context/CoupleContext';
+import { useMood } from '@/hooks/useMood';
+import { useMoodStreak } from '@/hooks/useMoodStreak';
+import { useMessages } from '@/hooks/useMessages';
 import { Avatar } from '@/components/ui/Avatar';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { TogetherCounter } from '@/components/home/TogetherCounter';
 import { DailyQuote } from '@/components/home/DailyQuote';
 import { PresenceBadge } from '@/components/home/PresenceBadge';
+import { MoodStatusRow } from '@/components/home/MoodStatusRow';
 import { FloatingHearts } from '@/components/effects/FloatingHearts';
+import { triggerHeartBurst } from '@/components/effects/HeartBurst';
 import { BottomNav } from '@/components/ui/BottomNav';
 
 const quickLinks = [
-  { to: '/notes', label: 'Love Notes', icon: MessageCircle },
+  { to: '/notes', label: 'Chats', icon: MessageCircle },
   { to: '/mood', label: 'Mood', icon: Smile },
   { to: '/study', label: 'Study', icon: Timer },
   { to: '/memories', label: 'Memories', icon: ImageIcon },
@@ -23,6 +39,18 @@ const quickLinks = [
 export default function Home() {
   const { profile } = useAuth();
   const { couple, partner, loading } = useCouple();
+  const { latestFor } = useMood(couple?.id ?? null);
+  const streak = useMoodStreak(couple?.id ?? null, couple?.boyfriend_id, couple?.girlfriend_id);
+  const { sendMessage } = useMessages(couple?.id ?? null, profile?.id ?? null);
+  const [pingSent, setPingSent] = useState(false);
+
+  const handleThinkingOfYou = (e: MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    triggerHeartBurst(rect.left + rect.width / 2, rect.top);
+    sendMessage('💭 Thinking of you');
+    setPingSent(true);
+    setTimeout(() => setPingSent(false), 2000);
+  };
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-blush/60 via-cream to-cream pb-28 dark:from-charcoal-100/60 dark:via-charcoal dark:to-charcoal">
@@ -68,13 +96,39 @@ export default function Home() {
             <>
               <TogetherCounter since={couple?.anniversary_date ?? couple?.connected_at ?? null} />
               <PresenceBadge online={partner.is_online} name={partner.display_name} />
+              {streak > 1 && (
+                <span className="flex items-center gap-1 rounded-pill bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
+                  <Flame size={13} /> {streak}-day check-in streak
+                </span>
+              )}
             </>
           )}
         </GlassCard>
 
+        {partner && (
+          <GlassCard delay={0.02}>
+            <MoodStatusRow
+              myName={profile?.display_name ?? 'You'}
+              partnerName={partner.display_name}
+              myMood={profile ? latestFor(profile.id) : null}
+              partnerMood={latestFor(partner.id)}
+            />
+          </GlassCard>
+        )}
+
         <GlassCard delay={0.05}>
           <DailyQuote couple={couple} />
         </GlassCard>
+
+        {partner && (
+          <button
+            onClick={handleThinkingOfYou}
+            className="flex w-full items-center justify-center gap-2 rounded-pill bg-white/70 py-3 text-sm font-medium text-rose-500 shadow-soft active:scale-[0.97] transition-transform dark:bg-white/10"
+          >
+            <Heart size={16} className={pingSent ? 'fill-rose-500' : ''} />
+            {pingSent ? 'Sent! 💗' : `Send ${partner.display_name.split(' ')[0]} a "thinking of you"`}
+          </button>
+        )}
 
         <div>
           <h2 className="mb-3 px-1 font-display text-base text-ink dark:text-cream">Together</h2>

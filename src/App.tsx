@@ -2,8 +2,10 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { CoupleProvider } from '@/context/CoupleContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { NotificationProvider } from '@/context/NotificationContext';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
 import { HeartBurstLayer } from '@/components/effects/HeartBurst';
+import { ToastLayer } from '@/components/ui/Toast';
 import { FullScreenLoader } from '@/components/ui/Spinner';
 
 import Welcome from '@/pages/auth/Welcome';
@@ -77,12 +79,15 @@ export default function App() {
     <ThemeProvider>
       <AuthProvider>
         <CoupleProvider>
-          <BrowserRouter>
-            <div className="mx-auto max-w-md">
-              <AppRoutes />
-            </div>
-            <HeartBurstLayer />
-          </BrowserRouter>
+          <NotificationProvider>
+            <BrowserRouter>
+              <div className="mx-auto max-w-md">
+                <AppRoutes />
+              </div>
+              <HeartBurstLayer />
+              <ToastLayer />
+            </BrowserRouter>
+          </NotificationProvider>
         </CoupleProvider>
       </AuthProvider>
     </ThemeProvider>

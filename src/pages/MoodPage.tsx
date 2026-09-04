@@ -13,7 +13,7 @@ const moodOrder: MoodType[] = ['amazing', 'happy', 'okay', 'tired', 'stressed', 
 export default function MoodPage() {
   const { profile } = useAuth();
   const { couple, partner } = useCouple();
-  const { setMood, latestFor } = useMood(couple?.id ?? null);
+  const { setMood, latestFor, saving } = useMood(couple?.id ?? null);
 
   const myMood = profile ? latestFor(profile.id) : null;
   const partnerMood = partner ? latestFor(partner.id) : null;
@@ -68,8 +68,9 @@ export default function MoodPage() {
                   transition={{ delay: i * 0.03 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => handlePick(mood)}
+                  disabled={saving}
                   className={cx(
-                    'glass-card flex flex-col items-center gap-1.5 py-4',
+                    'glass-card flex flex-col items-center gap-1.5 py-4 disabled:opacity-60',
                     active && 'ring-2 ring-rose-400'
                   )}
                 >
