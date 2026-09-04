@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-cream text-ink font-sans antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  html.dark body {
+    @apply bg-charcoal text-cream-100;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: theme('fontFamily.display');
+  }
+
+  ::selection {
+    @apply bg-rose-300/50;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply rounded-card border border-white/60 bg-white/60 shadow-glass backdrop-blur-glass;
+  }
+
+  html.dark .glass-card {
+    @apply border-white/10 bg-white/5 shadow-glass-dark;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-pill bg-rose-500 px-6 py-3.5
+      text-[15px] font-semibold text-white shadow-soft transition-transform duration-150
+      active:scale-[0.97] disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-pill border border-rose-300/60
+      bg-white/70 px-6 py-3.5 text-[15px] font-semibold text-rose-700 transition-transform
+      duration-150 active:scale-[0.97] dark:bg-white/5 dark:text-rose-300;
+  }
+
+  .input-field {
+    @apply w-full rounded-2xl border border-ink/10 bg-white/70 px-4 py-3.5 text-[15px]
+      text-ink placeholder:text-ink-500 outline-none transition focus:border-rose-300
+      focus:ring-4 focus:ring-rose-100 dark:border-white/10 dark:bg-white/5 dark:text-cream
+      dark:placeholder:text-cream/40 dark:focus:ring-rose-500/10;
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Custom scrollbar, hidden on mobile-first surfaces */
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
