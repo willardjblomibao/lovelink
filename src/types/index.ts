@@ -1,14 +1,6 @@
 export type PartnerRole = 'boyfriend' | 'girlfriend';
 
-export type MoodType =
-  | 'amazing'
-  | 'happy'
-  | 'okay'
-  | 'tired'
-  | 'stressed'
-  | 'sad'
-  | 'sick'
-  | 'missing_you';
+export type MoodType = string;
 
 export type EventType = 'anniversary' | 'birthday' | 'date' | 'reminder' | 'custom';
 
@@ -82,6 +74,7 @@ export interface Mood {
   couple_id: string;
   user_id: string;
   mood: MoodType;
+  mood_emoji: string | null;
   note: string | null;
   created_at: string;
 }
@@ -148,7 +141,7 @@ export interface PartnerLocation {
   updated_at: string;
 }
 
-export const MOOD_META: Record<MoodType, { emoji: string; label: string; support: string }> = {
+export const MOOD_META: Record<string, { emoji: string; label: string; support: string }> = {
   amazing: { emoji: '🤩', label: 'Amazing', support: "That's the glow I love to see. Keep shining." },
   happy: { emoji: '😊', label: 'Happy', support: 'Your happiness makes my whole day better.' },
   okay: { emoji: '🙂', label: 'Okay', support: "Steady days count too. I'm right here with you." },
@@ -158,3 +151,17 @@ export const MOOD_META: Record<MoodType, { emoji: string; label: string; support
   sick: { emoji: '🤒', label: 'Sick', support: 'Please rest and drink water. Sending all my care your way.' },
   missing_you: { emoji: '🥺', label: 'Missing you', support: "I'm missing you right back, more than words can say." }
 };
+
+export const PRESET_MOODS = ['amazing', 'happy', 'okay', 'tired', 'stressed', 'sad', 'sick', 'missing_you'];
+
+/** Returns the emoji + label to show for any mood — preset or custom. */
+export function getMoodDisplay(mood: Mood): { emoji: string; label: string } {
+  const preset = MOOD_META[mood.mood];
+  if (preset) return { emoji: preset.emoji, label: preset.label };
+  return { emoji: mood.mood_emoji || '💫', label: mood.mood };
+}
+
+/** Returns a supportive line for a partner's mood — a tailored one for presets, a warm generic one for custom moods. */
+export function getMoodSupport(mood: Mood): string {
+  return MOOD_META[mood.mood]?.support ?? "Thanks for sharing how you're feeling — I'm here with you.";
+}

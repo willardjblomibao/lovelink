@@ -60,13 +60,18 @@ export function useMessages(coupleId: string | null, myId: string | null) {
   }, [coupleId]);
 
   const sendMessage = async (content: string) => {
-    if (!coupleId || !myId || !content.trim()) return;
-    await supabase.from('messages').insert({
+    if (!coupleId || !myId || !content.trim()) return { error: 'Nothing to send.' };
+    const { error } = await supabase.from('messages').insert({
       couple_id: coupleId,
       sender_id: myId,
       content: content.trim(),
       delivered_at: new Date().toISOString()
     });
+    if (error) {
+      console.error('LoveLink: failed to send message', error);
+      return { error: error.message };
+    }
+    return { error: null };
   };
 
   const react = async (messageId: string, emoji: string) => {

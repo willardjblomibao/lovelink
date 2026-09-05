@@ -63,7 +63,7 @@ export function useMood(coupleId: string | null) {
     };
   }, [coupleId]);
 
-  const setMood = async (coupleId: string, userId: string, mood: MoodType, note?: string) => {
+  const setMood = async (coupleId: string, userId: string, mood: MoodType, emoji?: string, note?: string) => {
     // Guard against rapid repeated taps firing overlapping requests.
     if (savingRef.current) return;
     savingRef.current = true;
@@ -73,9 +73,18 @@ export function useMood(coupleId: string | null) {
     const dateStr = todayDateString();
     setTodayMoods((prev) => {
       const existing = prev.find((m) => m.user_id === userId);
-      if (existing) return prev.map((m) => (m.user_id === userId ? { ...m, mood, note: note ?? null } : m));
+      if (existing)
+        return prev.map((m) => (m.user_id === userId ? { ...m, mood, mood_emoji: emoji ?? null, note: note ?? null } : m));
       return [
-        { id: `optimistic-${userId}`, couple_id: coupleId, user_id: userId, mood, note: note ?? null, created_at: new Date().toISOString() } as Mood,
+        {
+          id: `optimistic-${userId}`,
+          couple_id: coupleId,
+          user_id: userId,
+          mood,
+          mood_emoji: emoji ?? null,
+          note: note ?? null,
+          created_at: new Date().toISOString()
+        } as Mood,
         ...prev
       ];
     });
@@ -85,7 +94,7 @@ export function useMood(coupleId: string | null) {
     await supabase
       .from('moods')
       .upsert(
-        { couple_id: coupleId, user_id: userId, mood, note, mood_date: dateStr, created_at: new Date().toISOString() },
+        { couple_id: coupleId, user_id: userId, mood, mood_emoji: emoji ?? null, note, mood_date: dateStr, created_at: new Date().toISOString() },
         { onConflict: 'couple_id,user_id,mood_date' }
       );
 

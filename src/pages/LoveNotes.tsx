@@ -17,6 +17,7 @@ export default function LoveNotes() {
   const { clearUnreadChats } = useNotifications();
 
   const [draft, setDraft] = useState('');
+  const [sendError, setSendError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const typingTimeout = useRef<ReturnType<typeof setTimeout>>();
 
@@ -36,13 +37,21 @@ export default function LoveNotes() {
     typingTimeout.current = setTimeout(() => setTyping(false), 1500);
   };
 
-  const handleSend = (e: MouseEvent<HTMLButtonElement>) => {
+  const handleSend = async (e: MouseEvent<HTMLButtonElement>) => {
     if (!draft.trim()) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    triggerHeartBurst(rect.left + rect.width / 2, rect.top);
-    sendMessage(draft);
+    const text = draft;
     setDraft('');
     setTyping(false);
+    setSendError(null);
+
+    const { error } = await sendMessage(text);
+    if (error) {
+      setDraft(text); // restore so nothing is lost
+      setSendError(error);
+    } else {
+      triggerHeartBurst(rect.left + rect.width / 2, rect.top);
+    }
   };
 
   return (
@@ -113,6 +122,12 @@ export default function LoveNotes() {
         <div ref={bottomRef} />
       </div>
 
+      {sendError && (
+        <div className="mx-4 mb-1 rounded-xl bg-rose-100 px-3 py-2 text-xs text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">
+          Couldn't send: {sendError}
+        </div>
+      )}
+
       <div className="safe-bottom flex items-end gap-2 border-t border-white/50 bg-white/70 px-4 py-3 backdrop-blur-glass dark:border-white/10 dark:bg-charcoal-100/80">
         <textarea
           value={draft}
@@ -121,9 +136,16 @@ export default function LoveNotes() {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
               if (draft.trim()) {
-                sendMessage(draft);
+                const text = draft;
                 setDraft('');
                 setTyping(false);
+                setSendError(null);
+                sendMessage(text).then(({ error }) => {
+                  if (error) {
+                    setDraft(text);
+                    setSendError(error);
+                  }
+                });
               }
             }
           }}

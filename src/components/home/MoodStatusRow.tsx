@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
-import { MOOD_META } from '@/types';
+import { getMoodDisplay } from '@/types';
 import type { Mood } from '@/types';
 
 export function MoodStatusRow({
@@ -58,7 +58,7 @@ function StatusBubble({ name, mood, align }: { name: string; mood: Mood | null; 
         >
           {mood ? (
             <>
-              {MOOD_META[mood.mood].emoji} feeling {MOOD_META[mood.mood].label.toLowerCase()}
+              {getMoodDisplay(mood).emoji} feeling {getMoodDisplay(mood).label.toLowerCase()}
             </>
           ) : (
             <span className="text-ink-500/60 dark:text-cream/30">no update yet</span>

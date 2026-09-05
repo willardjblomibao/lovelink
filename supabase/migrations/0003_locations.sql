@@ -1,5 +1,6 @@
 -- =========================================================
--- LoveLink — Migration 3: partner location sharing
+-- LoveLink — Migration 3 (fixed): partner location sharing
+-- Safe to re-run even if it partially succeeded before.
 -- =========================================================
 
 create table if not exists public.locations (
@@ -14,7 +15,6 @@ create table if not exists public.locations (
 
 alter table public.locations enable row level security;
 
--- Only the two linked partners can ever see either location.
 do $$ begin
   create policy "locations_select_couple" on public.locations
     for select using (couple_id = public.current_couple_id());
@@ -30,4 +30,8 @@ do $$ begin
     for update using (couple_id = public.current_couple_id() and user_id = auth.uid());
 exception when duplicate_object then null; end $$;
 
-alter publication supabase_realtime add table public.locations;
+-- Only add to the realtime publication if it isn't already a member
+-- (this is the line that failed for you — now guarded).
+do $$ begin
+  alter publication supabase_realtime add table public.locations;
+exception when duplicate_object then null; end $$;

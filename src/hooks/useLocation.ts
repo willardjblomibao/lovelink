@@ -44,7 +44,10 @@ export function useLocation(coupleId: string | null, myId: string | null, partne
   }, [coupleId, myId, partnerId]);
 
   const shareCurrentLocation = () => {
-    if (!coupleId || !myId) return;
+    if (!coupleId || !myId) {
+      setError('You need to be linked with your partner before sharing your location.');
+      return;
+    }
     if (!('geolocation' in navigator)) {
       setError('Location isn\u2019t supported on this device/browser.');
       return;
@@ -72,8 +75,9 @@ export function useLocation(coupleId: string | null, myId: string | null, partne
           .single();
 
         if (upsertError) {
+          console.error('LoveLink: failed to save location', upsertError);
           setSharing(false);
-          setError('Couldn\u2019t save your location. Please try again.');
+          setError(`Couldn\u2019t save your location: ${upsertError.message}`);
           return;
         }
 
