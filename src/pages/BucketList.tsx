@@ -34,7 +34,7 @@ export default function BucketList() {
       .order('created_at', { ascending: false });
     setItems((data as BucketListItem[]) ?? []);
   }, [couple?.id]);
-// hello
+
   useEffect(() => {
     load();
   }, [load]);

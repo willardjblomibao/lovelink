@@ -19,10 +19,12 @@ as a PWA on both partners' phones.
 ## 2. Set up Supabase
 
 1. Create a new Supabase project.
-2. Open **SQL Editor** and run, in order, `supabase/migrations/0001_init.sql` then
-   `supabase/migrations/0002_mood_dedupe_and_editing.sql`. The first creates the full schema;
-   the second adds a per-day unique constraint on moods (so repeated taps update one row
-   instead of creating duplicates) and the matching update policy. Migration 1 creates:
+2. Open **SQL Editor** and run, in order:
+   `0001_init.sql` → `0002_mood_dedupe_and_editing.sql` → `0003_locations.sql` →
+   `0004_location_labels.sql`. The first creates the full schema; the second adds a per-day
+   unique constraint on moods (cleaning up any pre-existing duplicates first); the third adds
+   partner location sharing; the fourth adds a human-readable place name column. Migration 1
+   creates:
    - Tables: `users`, `couples`, `messages`, `typing_status`, `memories`, `events`, `moods`,
      `bucket_list`, `locket_photos`, `surprises`, `study_sessions`, `study_tasks`
    - RPC functions `create_couple` / `join_couple` for invite-code linking
@@ -140,6 +142,13 @@ subscriptions scoped per couple, so both phones update within milliseconds of ea
   note to your partner (with the heart-burst animation), no typing required.
 - **New feature — check-in streak**: Home shows a flame badge counting consecutive days both
   of you have logged a mood.
+- **New feature — Find Partner**: a location page where either partner can tap "Share my
+  current location" (uses the browser's Geolocation API, permission-gated) to post their
+  coordinates; the other partner sees it on an embedded map with a **readable place name**
+  (e.g. "SM City Cabanatuan" instead of raw coordinates, via free reverse-geocoding — no API
+  key needed), an "updated Xm/h/d ago" timestamp, an "Open in Maps" link, and the live
+  distance between you. Nothing is tracked automatically or in the background — it only
+  updates when someone taps share.
 
 ## Notes & next steps
 

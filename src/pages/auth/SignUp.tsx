@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { TopBar } from '@/components/ui/TopBar';
+import { Mail } from 'lucide-react';
 
 export default function SignUp() {
   const { signUpWithEmail, signInWithGoogle } = useAuth();
@@ -29,7 +30,9 @@ export default function SignUp() {
   if (sent) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-4 bg-cream px-6 text-center dark:bg-charcoal">
-        <span className="text-5xl">💌</span>
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-rose-100 text-rose-500 dark:bg-rose-500/10">
+          <Mail size={28} />
+        </span>
         <h2 className="font-display text-xl text-ink dark:text-cream">Check your inbox</h2>
         <p className="text-sm text-ink-500 dark:text-cream/60">
           We sent a confirmation link to <strong>{email}</strong>. Tap it, then come back and log in.

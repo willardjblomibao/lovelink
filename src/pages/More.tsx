@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Smile, Timer, ListChecks, Lock, Sparkles, Settings as SettingsIcon } from 'lucide-react';
+import { Smile, Timer, ListChecks, Lock, Sparkles, Settings as SettingsIcon, MapPin } from 'lucide-react';
 import { TopBar } from '@/components/ui/TopBar';
 import { BottomNav } from '@/components/ui/BottomNav';
 
@@ -9,6 +9,7 @@ const links = [
   { to: '/study', label: 'Study Together', desc: 'Shared Pomodoro & checklist', icon: Timer },
   { to: '/bucket-list', label: 'Bucket List', desc: 'Date ideas & dreams', icon: ListChecks },
   { to: '/locket', label: 'Locket', desc: 'Send a photo, instantly', icon: Sparkles },
+  { to: '/location', label: 'Find Partner', desc: 'Last known & current location', icon: MapPin },
   { to: '/surprises', label: 'Secret Surprises', desc: 'Hidden notes for the future', icon: Lock },
   { to: '/settings', label: 'Settings', desc: 'Profile, theme, account', icon: SettingsIcon }
 ];

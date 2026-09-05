@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera } from 'lucide-react';
+import { Camera, Heart } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { useCouple } from '@/context/CoupleContext';
@@ -79,8 +79,8 @@ export default function Locket() {
                 alt="Locket"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-rose-100 to-rose-300 text-5xl dark:from-rose-500/20 dark:to-rose-500/10">
-                💗
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-rose-100 to-rose-300 dark:from-rose-500/20 dark:to-rose-500/10">
+                <Heart size={48} className="fill-rose-500 text-rose-500" />
               </div>
             )}
           </AnimatePresence>

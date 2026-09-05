@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 import { MOOD_META } from '@/types';
 import type { Mood } from '@/types';
 
@@ -29,9 +30,9 @@ export function MoodStatusRow({
       <motion.span
         animate={{ scale: [1, 1.15, 1] }}
         transition={{ repeat: Infinity, duration: 2 }}
-        className="shrink-0 text-xl"
+        className="shrink-0"
       >
-        💗
+        <Heart size={20} className="fill-rose-500 text-rose-500" />
       </motion.span>
 
       <StatusBubble name={partnerName} mood={partnerMood} align="left" />

@@ -126,7 +126,7 @@ export default function CalendarPage() {
   const exportAnniversaryToPhone = () => {
     if (!couple?.anniversary_date) return;
     const ics = buildICS({
-      title: 'Our Anniversary 💗',
+      title: 'Our Anniversary',
       dateStr: couple.anniversary_date,
       description: 'LoveLink anniversary reminder',
       recurringYearly: true

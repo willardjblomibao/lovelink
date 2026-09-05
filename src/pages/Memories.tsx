@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Heart, Trash2, X } from 'lucide-react';
+import { Plus, Heart, Trash2, X, ImageOff } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { useCouple } from '@/context/CoupleContext';
@@ -123,7 +123,7 @@ export default function Memories() {
         </div>
       ) : visible.length === 0 ? (
         <div className="flex flex-col items-center gap-3 pt-20 text-center px-8">
-          <span className="text-4xl">🖼️</span>
+          <ImageOff size={40} className="text-ink-500/40 dark:text-cream/20" />
           <p className="text-sm text-ink-500 dark:text-cream/50">
             No memories yet. Tap + to add your first photo together.
           </p>

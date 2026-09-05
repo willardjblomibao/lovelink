@@ -66,7 +66,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           setTimeout(() => setToasts((t) => t.filter((x) => x.id !== toast.id)), 4500);
 
           if (permission === 'granted' && document.hidden) {
-            new Notification(`💗 ${partner?.display_name ?? 'Your partner'}`, {
+            new Notification(partner?.display_name ?? 'Your partner', {
               body: msg.content,
               icon: '/icons/icon-192.png'
             });

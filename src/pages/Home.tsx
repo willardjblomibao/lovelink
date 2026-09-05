@@ -10,7 +10,8 @@ import {
   ListChecks,
   Lock,
   Flame,
-  Heart
+  Heart,
+  MapPin
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCouple } from '@/context/CoupleContext';
@@ -33,6 +34,7 @@ const quickLinks = [
   { to: '/study', label: 'Study', icon: Timer },
   { to: '/memories', label: 'Memories', icon: ImageIcon },
   { to: '/bucket-list', label: 'Bucket List', icon: ListChecks },
+  { to: '/location', label: 'Find Partner', icon: MapPin },
   { to: '/surprises', label: 'Surprises', icon: Lock }
 ];
 
@@ -47,7 +49,7 @@ export default function Home() {
   const handleThinkingOfYou = (e: MouseEvent<HTMLButtonElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     triggerHeartBurst(rect.left + rect.width / 2, rect.top);
-    sendMessage('💭 Thinking of you');
+    sendMessage('Thinking of you');
     setPingSent(true);
     setTimeout(() => setPingSent(false), 2000);
   };
@@ -73,9 +75,9 @@ export default function Home() {
             <motion.span
               animate={{ scale: [1, 1.25, 1] }}
               transition={{ repeat: Infinity, duration: 1.8 }}
-              className="-mx-3 z-10 text-2xl"
+              className="-mx-3 z-10"
             >
-              💗
+              <Heart size={26} className="fill-rose-500 text-rose-500 drop-shadow-sm" />
             </motion.span>
             <Avatar
               name={partner?.display_name ?? 'Partner'}
@@ -126,7 +128,7 @@ export default function Home() {
             className="flex w-full items-center justify-center gap-2 rounded-pill bg-white/70 py-3 text-sm font-medium text-rose-500 shadow-soft active:scale-[0.97] transition-transform dark:bg-white/10"
           >
             <Heart size={16} className={pingSent ? 'fill-rose-500' : ''} />
-            {pingSent ? 'Sent! 💗' : `Send ${partner.display_name.split(' ')[0]} a "thinking of you"`}
+            {pingSent ? 'Sent!' : `Send ${partner.display_name.split(' ')[0]} a "thinking of you"`}
           </button>
         )}
 

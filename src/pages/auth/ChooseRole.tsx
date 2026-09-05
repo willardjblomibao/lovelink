@@ -1,13 +1,14 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { UserRound, UserCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import type { PartnerRole } from '@/types';
 import { useState } from 'react';
 import { Spinner } from '@/components/ui/Spinner';
 
-const options: { role: PartnerRole; label: string; emoji: string }[] = [
-  { role: 'boyfriend', label: 'Boyfriend', emoji: '🤵' },
-  { role: 'girlfriend', label: 'Girlfriend', emoji: '👰' }
+const options: { role: PartnerRole; label: string; icon: typeof UserRound }[] = [
+  { role: 'boyfriend', label: 'Boyfriend', icon: UserRound },
+  { role: 'girlfriend', label: 'Girlfriend', icon: UserCircle }
 ];
 
 export default function ChooseRole() {
@@ -45,7 +46,9 @@ export default function ChooseRole() {
             disabled={saving !== null}
             className="glass-card flex flex-col items-center gap-3 py-10"
           >
-            <span className="text-5xl">{opt.emoji}</span>
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-rose-100 text-rose-500 dark:bg-rose-500/10">
+              <opt.icon size={28} />
+            </span>
             <span className="font-display text-lg text-ink dark:text-cream">{opt.label}</span>
             {saving === opt.role && <Spinner size={18} className="text-rose-500" />}
           </motion.button>

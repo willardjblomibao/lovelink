@@ -1,4 +1,5 @@
 import { cx, initials } from '@/lib/utils';
+import { Heart } from 'lucide-react';
 
 export function Avatar({
   name,
@@ -13,6 +14,7 @@ export function Avatar({
   online?: boolean;
   ring?: boolean;
 }) {
+  const initialsText = initials(name);
   return (
     <div className="relative inline-block shrink-0" style={{ width: size, height: size }}>
       <div
@@ -24,8 +26,10 @@ export function Avatar({
       >
         {src ? (
           <img src={src} alt={name} className="h-full w-full object-cover" />
+        ) : initialsText ? (
+          <span>{initialsText}</span>
         ) : (
-          <span>{initials(name) || '💗'}</span>
+          <Heart size={size * 0.4} className="fill-white/90 text-white/90" />
         )}
       </div>
       {online !== undefined && (

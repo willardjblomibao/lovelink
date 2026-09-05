@@ -23,6 +23,7 @@ import MoodPage from '@/pages/MoodPage';
 import Locket from '@/pages/Locket';
 import BucketList from '@/pages/BucketList';
 import SecretSurprise from '@/pages/SecretSurprise';
+import LocationPage from '@/pages/LocationPage';
 import More from '@/pages/More';
 import Settings from '@/pages/Settings';
 
@@ -66,6 +67,7 @@ function AppRoutes() {
       <Route path="/locket" element={<ProtectedRoute><Locket /></ProtectedRoute>} />
       <Route path="/bucket-list" element={<ProtectedRoute><BucketList /></ProtectedRoute>} />
       <Route path="/surprises" element={<ProtectedRoute><SecretSurprise /></ProtectedRoute>} />
+      <Route path="/location" element={<ProtectedRoute><LocationPage /></ProtectedRoute>} />
       <Route path="/more" element={<ProtectedRoute><More /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 

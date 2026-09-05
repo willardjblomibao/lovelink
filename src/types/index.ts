@@ -138,6 +138,16 @@ export interface StudyTask {
   created_at: string;
 }
 
+export interface PartnerLocation {
+  couple_id: string;
+  user_id: string;
+  latitude: number;
+  longitude: number;
+  accuracy_meters: number | null;
+  label: string | null;
+  updated_at: string;
+}
+
 export const MOOD_META: Record<MoodType, { emoji: string; label: string; support: string }> = {
   amazing: { emoji: '🤩', label: 'Amazing', support: "That's the glow I love to see. Keep shining." },
   happy: { emoji: '😊', label: 'Happy', support: 'Your happiness makes my whole day better.' },

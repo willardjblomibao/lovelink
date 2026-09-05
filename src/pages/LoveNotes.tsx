@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Check, CheckCheck } from 'lucide-react';
+import { Send, Check, CheckCheck, Heart } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCouple } from '@/context/CoupleContext';
 import { useNotifications } from '@/context/NotificationContext';
@@ -64,7 +64,7 @@ export default function LoveNotes() {
                   onDoubleClick={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect();
                     triggerHeartBurst(rect.left + rect.width / 2, rect.top);
-                    react(m.id, '❤️');
+                    react(m.id, 'heart');
                   }}
                   className={cx(
                     'relative rounded-2xl px-4 py-2.5 text-[15px] leading-relaxed shadow-soft',
@@ -74,8 +74,10 @@ export default function LoveNotes() {
                   )}
                 >
                   {m.content}
-                  {m.reaction && (
-                    <span className="absolute -bottom-3 -right-1 text-sm">{m.reaction}</span>
+                  {m.reaction === 'heart' && (
+                    <span className="absolute -bottom-3 -right-1">
+                      <Heart size={14} className="fill-rose-500 text-rose-500" />
+                    </span>
                   )}
                 </div>
                 <div className="flex items-center gap-1 px-1 text-[11px] text-ink-500 dark:text-cream/40">

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FloatingHearts } from '@/components/effects/FloatingHearts';
 
@@ -15,9 +16,9 @@ export default function Welcome() {
           initial={{ scale: 0.7, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 200, damping: 14 }}
-          className="mb-6 flex h-24 w-24 items-center justify-center rounded-card bg-white/70 text-5xl shadow-glass backdrop-blur-glass dark:bg-white/10"
+          className="mb-6 flex h-24 w-24 items-center justify-center rounded-card bg-white/70 shadow-glass backdrop-blur-glass dark:bg-white/10"
         >
-          💗
+          <Heart size={44} className="fill-rose-500 text-rose-500" />
         </motion.div>
         <motion.h1
           initial={{ opacity: 0, y: 10 }}

@@ -1,4 +1,5 @@
 import { cx } from '@/lib/utils';
+import { Heart } from 'lucide-react';
 
 export function Spinner({ size = 22, className }: { size?: number; className?: string }) {
   return (
@@ -14,7 +15,7 @@ export function FullScreenLoader() {
   return (
     <div className="flex h-screen w-full items-center justify-center bg-cream dark:bg-charcoal">
       <div className="flex flex-col items-center gap-3 text-rose-500">
-        <span className="animate-heart-pop text-4xl">💗</span>
+        <Heart size={36} className="animate-heart-pop fill-rose-500" />
         <Spinner />
       </div>
     </div>

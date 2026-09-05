@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { Heart } from 'lucide-react';
 
 interface Burst {
   id: number;
@@ -43,12 +44,12 @@ export function HeartBurstLayer() {
             {[0, 1, 2].map((i) => (
               <motion.span
                 key={i}
-                className="text-2xl text-rose-500"
+                className="text-rose-500"
                 initial={{ scale: 0, y: 0, opacity: 1, x: (i - 1) * 6 }}
                 animate={{ scale: [0, 1.3, 1], y: -60 - i * 12, opacity: [1, 1, 0] }}
                 transition={{ duration: 0.8, delay: i * 0.06, ease: 'easeOut' }}
               >
-                ❤️
+                <Heart size={24} className="fill-rose-500 text-rose-500" />
               </motion.span>
             ))}
           </motion.div>
