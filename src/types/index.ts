@@ -131,6 +131,23 @@ export interface StudyTask {
   created_at: string;
 }
 
+export type CallType = 'audio' | 'video';
+export type CallStatus = 'ringing' | 'active' | 'ended' | 'declined' | 'missed' | 'failed';
+
+export interface CallRecord {
+  id: string;
+  couple_id: string;
+  caller_id: string;
+  callee_id: string;
+  call_type: CallType;
+  status: CallStatus;
+  offer_sdp: string | null;
+  answer_sdp: string | null;
+  created_at: string;
+  answered_at: string | null;
+  ended_at: string | null;
+}
+
 export interface PartnerLocation {
   couple_id: string;
   user_id: string;

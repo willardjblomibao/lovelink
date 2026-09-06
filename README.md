@@ -21,10 +21,11 @@ as a PWA on both partners' phones.
 1. Create a new Supabase project.
 2. Open **SQL Editor** and run, in order:
    `0001_init.sql` → `0002_mood_dedupe_and_editing.sql` → `0003_locations.sql` →
-   `0004_location_labels.sql`. The first creates the full schema; the second adds a per-day
-   unique constraint on moods (cleaning up any pre-existing duplicates first); the third adds
-   partner location sharing; the fourth adds a human-readable place name column. Migration 1
-   creates:
+   `0004_location_labels.sql` → `0005_custom_moods.sql` → `0006_calls.sql`. The first creates
+   the full schema; the second adds a per-day unique constraint on moods (cleaning up any
+   pre-existing duplicates first); the third adds partner location sharing; the fourth adds a
+   human-readable place name column; the fifth allows custom mood text/emoji; the sixth adds
+   voice/video calling. Migration 1 creates:
    - Tables: `users`, `couples`, `messages`, `typing_status`, `memories`, `events`, `moods`,
      `bucket_list`, `locket_photos`, `surprises`, `study_sessions`, `study_tasks`
    - RPC functions `create_couple` / `join_couple` for invite-code linking
@@ -149,6 +150,26 @@ subscriptions scoped per couple, so both phones update within milliseconds of ea
   key needed), an "updated Xm/h/d ago" timestamp, an "Open in Maps" link, and the live
   distance between you. Nothing is tracked automatically or in the background — it only
   updates when someone taps share.
+
+- **New feature — Voice & video calls**: phone and video call buttons in the top-right of
+  Chats (like WhatsApp/Messenger). Uses **WebRTC** for real peer-to-peer audio/video between
+  the two phones — no third-party calling service, no per-minute cost. Signaling (who's
+  calling whom, ringing/accept/decline state) goes through a `calls` table + Supabase
+  Realtime; the actual call offer/answer and ICE candidates are exchanged the same way, and
+  once connected, audio/video streams flow directly device-to-device.
+  - **Important — HTTPS required**: camera/microphone access only works over HTTPS (your
+    Vercel URL already is) or on `localhost`. It will not work if you ever try it over plain
+    `http://`.
+  - **Important — no TURN server**: this uses free public STUN servers only, which handle the
+    vast majority of home Wi-Fi ↔ mobile data combinations, but not every network (e.g. some
+    corporate/campus networks with strict NAT). If a call rings but never connects, that's the
+    likely cause. A TURN server (e.g. via a service like Twilio, Metered, or self-hosted coturn)
+    would fix that at the cost of running/paying for that separate service — happy to wire it
+    in if it comes up.
+  - A call auto-marks itself "missed" after 45 seconds of no answer.
+  - This is the one feature in this app I could not end-to-end test on real devices myself
+    (no camera/mic in this sandbox) — please test thoroughly on both your phones, especially
+    on the exact networks you'll actually use it on.
 
 ## Notes & next steps
 

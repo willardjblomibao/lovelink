@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Check, CheckCheck, Heart } from 'lucide-react';
+import { Send, Check, CheckCheck, Heart, Phone, Video } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useCouple } from '@/context/CoupleContext';
 import { useNotifications } from '@/context/NotificationContext';
+import { useCall } from '@/context/CallContext';
 import { useMessages, useTypingIndicator } from '@/hooks/useMessages';
 import { TopBar } from '@/components/ui/TopBar';
 import { cx, formatTime } from '@/lib/utils';
@@ -15,6 +16,7 @@ export default function LoveNotes() {
   const { messages, sendMessage, react } = useMessages(couple?.id ?? null, profile?.id ?? null);
   const { partnerTyping, setTyping } = useTypingIndicator(couple?.id ?? null, profile?.id ?? null);
   const { clearUnreadChats } = useNotifications();
+  const { startCall } = useCall();
 
   const [draft, setDraft] = useState('');
   const [sendError, setSendError] = useState<string | null>(null);
@@ -56,7 +58,28 @@ export default function LoveNotes() {
 
   return (
     <div className="flex h-screen flex-col bg-cream dark:bg-charcoal">
-      <TopBar title={partner ? `${partner.display_name}` : 'Chats'} showBack right={<span />} />
+      <TopBar
+        title={partner ? `${partner.display_name}` : 'Chats'}
+        showBack
+        right={
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => startCall('audio')}
+              className="rounded-full p-2 text-rose-500 active:bg-rose-50 dark:active:bg-white/10"
+              aria-label="Voice call"
+            >
+              <Phone size={19} />
+            </button>
+            <button
+              onClick={() => startCall('video')}
+              className="rounded-full p-2 text-rose-500 active:bg-rose-50 dark:active:bg-white/10"
+              aria-label="Video call"
+            >
+              <Video size={19} />
+            </button>
+          </div>
+        }
+      />
 
       <div className="flex-1 space-y-3 overflow-y-auto px-4 pb-3 pt-2">
         {messages.map((m) => {

@@ -29,7 +29,7 @@ export function TopBar({
         )}
       </div>
       <h1 className="font-display text-lg font-medium text-ink dark:text-cream">{title}</h1>
-      <div className="flex w-10 items-center justify-end">
+      <div className="flex min-w-10 items-center justify-end">
         {right ?? (
           <button
             onClick={toggleTheme}

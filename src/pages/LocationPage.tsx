@@ -8,7 +8,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
 import { Spinner } from '@/components/ui/Spinner';
-import { distanceKm, timeAgo, osmEmbedUrl, googleMapsUrl } from '@/lib/utils';
+import { distanceKm, timeAgo, googleMapsEmbedUrl, googleMapsUrl } from '@/lib/utils';
 import type { PartnerLocation } from '@/types';
 
 export default function LocationPage() {
@@ -121,7 +121,7 @@ function LocationCard({
           <div className="overflow-hidden rounded-2xl border border-white/60 dark:border-white/10">
             <iframe
               title={`${label} location`}
-              src={osmEmbedUrl(location.latitude, location.longitude)}
+              src={googleMapsEmbedUrl(location.latitude, location.longitude)}
               className="h-40 w-full"
               loading="lazy"
             />

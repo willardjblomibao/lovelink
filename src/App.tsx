@@ -3,9 +3,11 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { CoupleProvider } from '@/context/CoupleContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { NotificationProvider } from '@/context/NotificationContext';
+import { CallProvider } from '@/context/CallContext';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
 import { HeartBurstLayer } from '@/components/effects/HeartBurst';
 import { ToastLayer } from '@/components/ui/Toast';
+import { CallOverlay } from '@/components/call/CallOverlay';
 import { FullScreenLoader } from '@/components/ui/Spinner';
 
 import Welcome from '@/pages/auth/Welcome';
@@ -82,13 +84,16 @@ export default function App() {
       <AuthProvider>
         <CoupleProvider>
           <NotificationProvider>
-            <BrowserRouter>
-              <div className="mx-auto max-w-md">
-                <AppRoutes />
-              </div>
-              <HeartBurstLayer />
-              <ToastLayer />
-            </BrowserRouter>
+            <CallProvider>
+              <BrowserRouter>
+                <div className="mx-auto max-w-md">
+                  <AppRoutes />
+                </div>
+                <HeartBurstLayer />
+                <ToastLayer />
+                <CallOverlay />
+              </BrowserRouter>
+            </CallProvider>
           </NotificationProvider>
         </CoupleProvider>
       </AuthProvider>

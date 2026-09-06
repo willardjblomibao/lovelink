@@ -66,6 +66,14 @@ export function osmEmbedUrl(lat: number, lon: number, deltaDeg = 0.01) {
   return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lon}`;
 }
 
+/**
+ * Google Maps embed with no API key required, using the legacy
+ * "output=embed" iframe format (q= centers + drops a pin on the point).
+ */
+export function googleMapsEmbedUrl(lat: number, lon: number, zoom = 16) {
+  return `https://maps.google.com/maps?q=${lat},${lon}&z=${zoom}&output=embed`;
+}
+
 export function googleMapsUrl(lat: number, lon: number) {
   return `https://www.google.com/maps?q=${lat},${lon}`;
 }
